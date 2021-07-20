@@ -12,7 +12,6 @@ package trabalho2;
 public class Config {
     public static String HOST = "localhost";
     public static Integer PORT = 2020;
-    public static String SERVER = "Server";
-    public static String URI = String.format("rmi://$s:%i/", HOST, PORT);
-    
+    public static String SERVER = "Servidor";
+    public static String URI = "rmi://"+HOST+":"+PORT+"/";    
 }

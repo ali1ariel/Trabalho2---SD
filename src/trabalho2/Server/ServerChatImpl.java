@@ -6,21 +6,12 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import trabalho2.Config;
 
 
 public class ServerChatImpl extends UnicastRemoteObject implements IServerChat {
-    private ArrayList<String> roomList;
-    private static String SERVER = "localhost";
-    private static Integer PORT = 2020;
-    private static String SERVICE = "ServerChat";
-    
-    
-    public static String getURI() {
-        String uri = String.format("rmi://%s:%d/$s", SERVER, PORT, SERVICE);
-        return uri;
-    }
-
-    
+    private ArrayList<String> roomList = new ArrayList<String>();
+     
     
     public ServerChatImpl() throws RemoteException {
         super();
@@ -31,22 +22,14 @@ public class ServerChatImpl extends UnicastRemoteObject implements IServerChat {
     }
     
     public void createRoom(String roomName) throws RemoteException{
-        RoomChat created = new RoomChat(roomName);
-        Integer size = this.roomList.size(); 
         try {
-            Naming.rebind("Room"+(size+1), created);
+            synchronized (roomList) {
+                RoomChat created = new RoomChat(roomName);
+                roomList.add(roomName);
+                Naming.rebind("ROOM"+roomName, created);
+            }
         } catch (MalformedURLException e) {
         }
-        this.roomList.add(roomName);
-    }
-    
-    public static void main(String args[]) {
-        try {
-            ServerChatImpl server = new ServerChatImpl();
-            Naming.rebind("Server", server);
-            System.out.println("Ligado no registro");
-        } catch(MalformedURLException | RemoteException ex) {
-            System.err.println("error: " + ex.getMessage());
-        }
+        roomList.add(roomName);
     }
 }

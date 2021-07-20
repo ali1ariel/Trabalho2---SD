@@ -8,7 +8,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Scanner;
 import trabalho2.Config;
 import trabalho2.Server.IServerChat;
 
@@ -27,6 +26,7 @@ public class UserChatImpl extends UnicastRemoteObject implements IUserChat {
     }
     
     public void setUsrName(String usrName) {
+        System.out.println(usrName);
         this.usrName = usrName;
     }
  
@@ -35,26 +35,18 @@ public class UserChatImpl extends UnicastRemoteObject implements IUserChat {
         
     	this.chatArea.append(String.format("%s: %s\r\n", senderName, msg));
     }
-    
-        public void start(Scanner sc) throws IOException {
-//    	//new ChatWindow();
-//    	do {
-//	        LoginWindow loginWindow = new LoginWindow();
-//	        username = loginWindow.Login();
-//    	} while (username == null || username.isEmpty());
-//        this.setUsername(username);
-//        new ButtonMessage("Bem-vindo " + username + "!", 250, 100);
-    }
-    
+   
     
     public void listRooms(IServerChat server) throws IOException {
         ArrayList<String> allRooms = server.getRooms();
-            System.out.println("index - Room Name");
-        int index = 1;
+            System.out.println("Room Name");
         for(String room : allRooms) {
-            System.out.println(String.format("%i - %s", index, room));
-            index ++;
+            System.out.println(String.format("%s", room));
         }                
+    }
+    
+    public void createRoom(IServerChat serverInterface, String roomName) throws Exception{
+                serverInterface.createRoom(roomName);
     }
     
     public String getUsrName() {

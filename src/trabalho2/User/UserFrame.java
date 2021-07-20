@@ -30,18 +30,23 @@ public class UserFrame extends Frame {
     private IServerChat server;
     private IRoomChat room;
     private String name;
-    private ArrayList<String> roomNames = this.server.getRooms();
+    private ArrayList<String> roomNames = new ArrayList();
     private ArrayList<String> usersInTheRoom = new ArrayList();
     private TextArea chatArea = new TextArea(20,70);
-    private TextArea entryArea = new TextArea(5,70);
-    private TextArea roomsArea = new TextArea(5,70);
+    private TextArea setNameArea = new TextArea(2,70);
+    private TextArea entryArea = new TextArea(5,90);
     private List clientList = new List(20, true);
+    private List roomsList = new List(18, true);
+    private TextArea createroomArea = new TextArea(2,10);
     private Button sendButton = new Button("Send");
     private Button logoutButton = new Button("Logout");
+    private Button changeUserNameButton = new Button("Change your username");
+    private Button newRoomButton = new Button("create room");
     
     public UserFrame(IServerChat server, String clientName) throws RemoteException {
         super(String.format("Chat Client - %s", clientName));
         this.server = server;
+        this.roomNames = server.getRooms();
         this.name = clientName;
         this.user = new UserChatImpl(chatArea);
            this.setBounds(0,0,700,500);
@@ -52,13 +57,17 @@ public class UserFrame extends Frame {
     private void setupComponents() {
         this.setLayout(new FlowLayout());
         this.chatArea.setEditable(false);
-        this.add(roomsArea);
+        this.add(roomsList);
+        this.add(createroomArea);
         this.add(chatArea);
         this.add(clientList);
         this.add(entryArea);
+        this.add(setNameArea);
         Panel p = new Panel();
         p.add(sendButton);
         p.add(logoutButton);
+        p.add(changeUserNameButton);
+        p.add(newRoomButton);
         this.add(p);
     }
     
@@ -85,20 +94,53 @@ public class UserFrame extends Frame {
                 }
                 entryArea.setText("");
             }
+        });        
+        
+        this.changeUserNameButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent we) {
+                try {            
+                    user.setUsrName(setNameArea.getText());
+                    System.out.println("Oi!");
+                } 
+                catch(Exception re) {
+                    re.printStackTrace();
+                }
+                setNameArea.setText("");
+            }
+        });     
+        
+        this.newRoomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent we) {
+                try {            
+                    user.createRoom(server, createroomArea.getText());
+                    System.out.println("Oi!");
+                } 
+                catch(Exception re) {
+                    re.printStackTrace();
+                }
+                createroomArea.setText("");
+            }
         });
         
         
         
     }
     
+    private void createRoom(String roomName) throws Exception {
+        user.createRoom(server, roomName);
+        this.roomNames = server.getRooms();
+                            System.out.println("Ok!");
+
+    }
+    
     private void logout() {
 //        try{
-//            this.server.logout(this.name);
+////            this.server.logout(this.name);
 //        }catch(RemoteException re) {
 //            re.printStackTrace();
 //        }
-//        this.dispose();
-//        System.exit(0);
+        this.dispose();
+        System.exit(0);
     }
     
     private void login(String roomName) throws NotBoundException, MalformedURLException {
@@ -106,16 +148,16 @@ public class UserFrame extends Frame {
             this.user.userJoin(roomName);
         }catch(RemoteException re) {
         }
-        this.dispose();
-        System.exit(0);
     }
 
 
     public static void main(String[] args) throws RemoteException, NotBoundException, MalformedURLException {
         
     String clientName = "tester";
-    IServerChat serverInterface = (IServerChat) Naming.lookup(String.format("%s%s", Config.URI, Config.SERVER));
+    IServerChat serverInterface = (IServerChat) Naming.lookup(""+Config.URI+""+Config.SERVER+"");
+    
     UserFrame frame = new UserFrame(serverInterface, clientName);
+    frame.setVisible(true);
     }
 }
 

@@ -5,6 +5,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import trabalho2.Config;
 
 public class ServerChat {
     ServerChatImpl server;
@@ -12,28 +13,28 @@ public class ServerChat {
     public ServerChat() {
         try {
             ServerChatImpl s = new ServerChatImpl();
-            Naming.rebind(ServerChatImpl.getURI(), s);
             this.server = s;
         }
         catch(Exception e) {
-                System.out.println("Erro: "+e);
+                System.out.println("Error: "+e);
         }
     }
     
     public static void main(String args[]) {
         try {
-			System.out.println("Criando RMI...");
-			Registry registry = LocateRegistry.createRegistry(2020);
+			System.out.println("Starting RMI...");
+			Registry registry = LocateRegistry.createRegistry(Config.PORT);
 			ServerChat server = new ServerChat();
 			try {
-				registry.bind("Server", server.server);
-				System.out.println("Servidor executando...");
+				registry.bind(Config.SERVER, server.server);
+				System.out.println("Server " + Config.SERVER + " executing in PORT " + Config.PORT + "...");
 			} catch (AlreadyBoundException | AccessException ex) {
-                System.out.println("Erro ao criar o servidor: " + ex.getMessage());
+                System.out.println("Error: " + ex.getMessage() +" - "+ex.getClass());
+                System.exit(0);
                 return;
             }
 		} catch(Exception ex) {
-			System.out.println("ERRO: Servidor RMI não conseguiu iniciar..." + ex.getMessage());
+			System.out.println("ERROR: Server RMI  on PORT " + Config.PORT + "didn`t start..." + ex.getMessage());
 		}
     }
 }
